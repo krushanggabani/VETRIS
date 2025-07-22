@@ -1,0 +1,14 @@
+# Virtual environment
+VRenv/
+
+# Distribution / packaging
+*.egg-info/
+
+
+# Ignoring specified data directories
+data/
+*.log
+
+
+# Miscellaneous
+.DS_Store
