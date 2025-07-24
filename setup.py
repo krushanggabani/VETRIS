@@ -21,6 +21,7 @@ if __name__ == '__main__':
             "opencv-python",
             "open3d",
             "pandas",
+            "pyglet",
             "scipy",
             "taichi",
             "torch",
