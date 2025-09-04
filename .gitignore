@@ -6,10 +6,14 @@ VRenv/
 
 
 # Ignoring specified data directories
-data/
+data/real/
+data/processed/
 logs/
 *.log
 
 
 # Miscellaneous
 .DS_Store
+
+__pycache__/
+*.pyc
