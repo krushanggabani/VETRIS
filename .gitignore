@@ -1,19 +1,33 @@
-# Virtual environment
+# ───────── VETRIS (.gitignore) ─────────
+
+# Python bytecode / packaging
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+
+
+# Virtual envs
 VRenv/
 
-# Distribution / packaging
-*.egg-info/
+# Caches & tooling
+.pytest_cache/
+.vscode/
 
 
-# Ignoring specified data directories
-data/real/
-data/processed/
-logs/
-*.log
-
-
-# Miscellaneous
+# OS cruft
 .DS_Store
 
-__pycache__/
-*.pyc
+
+# Project outputs and Data
+runs/**
+results/**
+data/real/**
+
+!data/media/**
+!docs/img/**

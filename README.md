@@ -5,7 +5,7 @@ VETRIS is a modular 2D physics engine in **Python + Taichi** for simulating visc
 
 <!-- Centered + sized -->
 <p align="center">
-  <img src="data/media/base_model.gif" alt="VETRIS demo" width="200" />
+  <img src="data/media/base_model.gif" alt="VETRIS demo" width="300" />
 </p>
 
 
