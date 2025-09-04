@@ -1,5 +1,7 @@
 # VETRIS: ViscoElastic Tissue-Robot Interaction Simulation with Material Point Method
 
+Krushang gabani
+
 **VETRIS** is a physics engine designed to simulate **viscoelastic soft tissue interactions with robotic systems** using the **Material Point Method (MPM)**. It focuses on capturing realistic tissue dynamics, viscoelastic deformation, and two-way coupling between soft and rigid bodies, enabling research in **soft robotics, biomechanics, and contact-aware manipulation**.
 
 ---
