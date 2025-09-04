@@ -1,10 +1,12 @@
-# VETRIS : ViscoElastic Tissue–Robot Interaction Simulation with Material Point Method
-
-Author: Krushang Gabani
+# VETRIS : ViscoElastic Tissue–Robot Interaction Simulation
 
 VETRIS is a modular 2D physics engine in **Python + Taichi** for simulating viscoelastic soft-tissue interaction with robotic systems using **MLS-MPM**. It targets realistic tissue dynamics, viscoelastic deformation, and two-way soft–rigid coupling, with first-class support for **Real2Sim calibration**, **environment validation**, and **control/design optimization**.
 
-## Highlights
+
+![base_model](data/media/base_model.gif)
+
+
+## 🌟 Features
 - **MPM core** with clean APIs (P2G/Grid/G2P), stable time-stepping, and contact/friction models.
 - **Viscoelastic materials**: Neo-Hookean, Kelvin–Voigt, Standard Linear Solid (plug-in ready).
 - **Two-way coupling** between deformable tissue and rigid proxies (SDF-based contact).
@@ -50,3 +52,16 @@ source VRenv/bin/activate
 pip install -e .            # Installs in editable mode
 ```
 
+---
+
+## 📜 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📬 Contact
+
+Questions or feedback? Open an issue or email me at <krushgabani95@gmail.com>.
+
+Happy simulating! 🚀
