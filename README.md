@@ -3,7 +3,10 @@
 VETRIS is a modular 2D physics engine in **Python + Taichi** for simulating viscoelastic soft-tissue interaction with robotic systems using **MLS-MPM**. It targets realistic tissue dynamics, viscoelastic deformation, and two-way soft–rigid coupling, with first-class support for **Real2Sim calibration**, **environment validation**, and **control/design optimization**.
 
 
-![base_model](data/media/base_model.gif)
+<!-- Centered + sized -->
+<p align="center">
+  <img src="data/media/base_model.gif" alt="VETRIS demo" width="200" />
+</p>
 
 
 ## 🌟 Features
