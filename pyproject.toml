@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vetris"
+version = "0.1.0"
+description = "VETRIS — ViscoElastic Tissue–Robot Interaction Simulation with MPM (Python + Taichi)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Krushang Gabani" }
+]
+keywords = ["mpm", "taichi", "soft-robotics", "biomechanics", "simulation", "real2sim", "viscoelastic"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+dependencies = [
+  "taichi>=1.7.0",
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "pandas>=2.0",
+  "pyyaml>=6.0",
+  "matplotlib>=3.7",
+  "imageio>=2.31",
+  "imageio-ffmpeg>=0.4.9",
+  "tqdm>=4.66",
+  "optuna>=3.5",            
+  "typing-extensions>=4.7"
+]
+
+[project.optional-dependencies]
+vis = [
+  "opencv-python>=4.8",
+  "pyrender>=0.1.45",
+  "trimesh>=4.0.0",
+]
+torch = [
+  "torch>=2.1; platform_system!='Darwin' or platform_machine!='arm64'",
+  "torchvision>=0.16; platform_system!='Darwin' or platform_machine!='arm64'"
+]
+opt = [
+  "nevergrad>=0.5.0",
+  "scikit-optimize>=0.9.0",
+]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.5.0",
+  "black>=24.4",
+  "mypy>=1.10",
+  "pre-commit>=3.7"
+]
+
+[project.scripts]
+vetris = "vetris.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["vetris*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+lint.select = ["E", "F", "I", "UP"]
+lint.ignore = ["E501"]  # handled by line-length
+target-version = "py310"
+
+[tool.coverage.run]
+branch = true
+source = ["src/vetris"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
