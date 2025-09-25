@@ -163,6 +163,7 @@ class Renderer:
             self.gui.text(f'Time: {massager.time_t:.3f} s', pos=self._hud_pos_time, color=0xFFFFFF)
             self.gui.text(f'Force(L): {cf_l:.2f} N', pos=self._hud_pos_fL,   color=0xFFFFFF)
             self.gui.text(f'Force(R): {cf_r:.2f} N', pos=self._hud_pos_fR,   color=0xFFFFFF)
+
         elif self.massager_tyepe == "straight":
             # contact halo
             ee   = massager.roller_center[0].to_numpy()
@@ -172,7 +173,8 @@ class Renderer:
 
             # arms
             self.roller_radius = float(massager.roller_radius)
-            self.draw_straightarm(massager.base_x, massager.base_y, massager.theta0, massager.L_arm, massager.roller_center)
+            box_size = massager.BOX_HX
+            self.draw_straightarm(massager.base_x, massager.base_y, massager.theta0, massager.L_arm, massager.roller_center,box_size)
 
             # HUD
             self.gui.text(f'Time: {massager.time_t:.3f} s',
@@ -245,7 +247,7 @@ class Renderer:
         self.gui.circle(ee, radius=rr,     color=0xAAAAAA)
 
 
-    def draw_straightarm(self,base_x, base_y, theta0, L, ee_center):
+    def draw_straightarm(self,base_x, base_y, theta0, L, ee_center,box_size):
         base_pt = np.array([base_x, base_y], dtype=np.float32)
         tip     = ee_center[0].to_numpy()
 
@@ -267,5 +269,19 @@ class Renderer:
 
         # roller ring at the tip
         rr = int(self.roller_radius * 1024)
-        self.gui.circle(tip, radius=rr + 2, color=ROLLER_EDGE)
-        self.gui.circle(tip, radius=rr,     color=0xAAAAAA)
+        self.draw_square(tip,(box_size,box_size),color=0xAAAAAA,radius=2)
+        # self.gui.circle(tip, radius=rr + 2, color=ROLLER_EDGE)
+        # self.gui.circle(tip, radius=rr,     color=0xAAAAAA)
+
+
+    def draw_square(self, center, half, color=0xFFFFFF, radius=2):
+        cx, cy = float(center[0]), float(center[1])
+        hx, hy = float(half[0]), float(half[1])
+        p1 = (cx - hx, cy - hy)
+        p2 = (cx + hx, cy - hy)
+        p3 = (cx + hx, cy + hy)
+        p4 = (cx - hx, cy + hy)
+        self.gui.line(begin=p1, end=p2, radius=radius, color=color)
+        self.gui.line(begin=p2, end=p3, radius=radius, color=color)
+        self.gui.line(begin=p3, end=p4, radius=radius, color=color)
+        self.gui.line(begin=p4, end=p1, radius=radius, color=color)

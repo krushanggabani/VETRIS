@@ -5,6 +5,7 @@ import time
 from vetris.vis.render import Renderer
 from vetris.engine.mpm import mpmengine
 from vetris.io.recorder import Recorder
+from vetris.io.logger import Logger
 
 ti.init(arch=ti.gpu, debug=False, fast_math=True, device_memory_GB=9)
 
@@ -15,8 +16,9 @@ class Simulation:
         self.recorder = Recorder(cfg)
         self.renderer = Renderer(cfg)
         self.engine  = mpmengine(cfg)
+        self.logger  = Logger(cfg)
 
-        print("Simulation initialized")
+        # print("Simulation initialized")
 
 
     def run(self):
@@ -24,8 +26,12 @@ class Simulation:
         while self.renderer.gui.running and self.engine.massager.massager.time_t < self.engine.massager.massager.Time_period:
             for _ in range(15):
                 self.engine.run()
+
+            # self.engine.massager.step(15)
+            self.logger.log(self.engine.get_state())
             self.renderer.render(self.engine)
 
+        self.logger.save_logs_to_csv("data/logs/simulation_logs.csv")
 
     def reset(self):
 

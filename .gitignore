@@ -28,6 +28,10 @@ VRenv/
 runs/**
 results/**
 data/real/**
+logs/
+
+calib*
+
 
 !data/media/**
 !docs/img/**

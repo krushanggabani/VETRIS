@@ -11,6 +11,7 @@ class massager:
     def __init__(self, cfg):
 
         self.cfg = cfg.engine.massager
+        self.cfg.dt = cfg.engine.dt
         self.type = self.cfg.type
         
 
@@ -26,6 +27,17 @@ class massager:
     def initialize(self):
         self.massager.initialize()
 
-    def step(self):
-        self.massager.step()
+    def step(self,n_substeps):
+        self.massager.step(n_substeps)
 
+     # unify dt from engine (optional)
+    def set_dt(self, dt: float):
+        if hasattr(self.massager, "set_dt"):
+            self.massager.set_dt(dt)
+
+    # reset contact force prior to grid update
+    def zero_contact_force(self):
+        if hasattr(self.massager, "zero_contact_force"):
+            self.massager.zero_contact_force()
+
+            

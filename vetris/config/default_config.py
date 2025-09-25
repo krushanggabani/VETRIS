@@ -68,8 +68,15 @@ class MPMCfg:
     particle_per_cell: int = 4
     material: str = "muscle"
     density: float = 1000.0
+
     youngs_modulus: float = 1.0e5
-    poisson_ratio: float = 0.3
+    poisson_ratio: float = 0.3    
+    shear_viscosity: float = 5.0
+    bulk_viscosity: float = 50.0
+    rate_k: float = 0.0
+    rate_n: float = 1.0
+
+
     friction: float = 0.5
     gravity: Tuple[float, float] = (0.0, -9.81)
     boundary_conditions: str = "solid_wall"
@@ -88,7 +95,7 @@ class MPMCfg:
 @dataclass
 class EngineCfg:
     steps: int = 1000
-    dt: float = 2.0e-4
+    dt: float = 1.2e-5
     massager: MassagerCfg = field(default_factory=MassagerCfg)
     mpm: MPMCfg = field(default_factory=MPMCfg)
 
