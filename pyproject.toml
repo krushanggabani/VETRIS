@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
   "taichi>=1.7.0",
   "numpy>=1.24",
+  "cma",
   "scipy>=1.10",
   "pandas>=2.0",
   "pyyaml>=6.0",
@@ -61,30 +62,6 @@ dev = [
   "pre-commit>=3.7"
 ]
 
-[project.scripts]
-vetris = "vetris.cli:main"
-
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"" = "vetris"}
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["vetris*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-q"
-
-[tool.ruff]
-line-length = 100
-lint.select = ["E", "F", "I", "UP"]
-lint.ignore = ["E501"]  # handled by line-length
-target-version = "py310"
-
-[tool.coverage.run]
-branch = true
-source = ["src/vetris"]
-
-[tool.coverage.report]
-show_missing = true
-skip_covered = true

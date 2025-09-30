@@ -58,9 +58,15 @@ class Plotter:
         self.force_col: str = ""
         self._times: Optional[np.ndarray] = None
         self._load_csv()
+        
+        
 
     # ---------------- CSV loading ----------------
 
+    def _get_raw(self):
+
+        return exp_i,exp_f
+    
     def _load_csv(self) -> None:
         with open(self.csv_path, "r", newline="") as f:
             reader = csv.DictReader(f)

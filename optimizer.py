@@ -26,6 +26,7 @@ rate_k           = 0.717367
 rate_n           = 1.519987
 
 
+
 # Update CONFIG with these parameter values for consistency
 CONFIG.engine.mpm.youngs_modulus   = youngs_modulus
 CONFIG.engine.mpm.poisson_ratio    = poisson_ratio
@@ -66,19 +67,40 @@ def main():
    
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    main()
+#     # main()
 
-    p= Plotter("data/logs/simulation_logs.csv")
+#     p= Plotter("data/logs/simulation_logs.csv")
 
-    # plain scatter
-    p.plot(show=True)
+#     sim_i,sim_f,t = p._get_xyt()
+
+#     exp_i,exp_f = p._get_raw()
+
+#     # # plain scatter
+#     # p.plot(show=True)
 
 
-    # show movement as a line + small arrows every ~10 steps
-    # p.plot_path(step=1, arrows_every=10, show=True)
+#     # show movement as a line + small arrows every ~10 steps
+#     # p.plot_path(step=1, arrows_every=10, show=True)
 
 
-    # animation (mp4 or gif)
-    # p.animate_force_strain("strain_vs_force.mp4", fps=24, tail=80)
+#     # animation (mp4 or gif)
+#     # p.animate_force_strain("strain_vs_force.mp4", fps=24, tail=80)
+
+
+
+from vetris.optimize.losses import HysteresisLoss
+from vetris.optimize.objective import Objective
+
+p= Plotter("data/logs/simulation_logs.csv")
+
+sim_i,sim_f,t = p._get_xyt()
+exp_i,exp_f = p._get_raw()
+
+loss = HysteresisLoss(weights=(10.0, 0.5, 100, 50.0))
+objective = Objective(loss)
+
+
+f, com, _ = objective.evaluate(p, exp_i, exp_f, sim_i, sim_f,meta="fine")
+

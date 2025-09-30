@@ -269,9 +269,9 @@ class Renderer:
 
         # roller ring at the tip
         rr = int(self.roller_radius * 1024)
-        self.draw_square(tip,(box_size,box_size),color=0xAAAAAA,radius=2)
-        # self.gui.circle(tip, radius=rr + 2, color=ROLLER_EDGE)
-        # self.gui.circle(tip, radius=rr,     color=0xAAAAAA)
+        # self.draw_square(tip,(box_size,box_size),color=0xAAAAAA,radius=2)
+        self.gui.circle(tip, radius=rr + 2, color=ROLLER_EDGE)
+        self.gui.circle(tip, radius=rr,     color=0xAAAAAA)
 
 
     def draw_square(self, center, half, color=0xFFFFFF, radius=2):
