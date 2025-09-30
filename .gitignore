@@ -28,9 +28,9 @@ VRenv/
 runs/**
 results/**
 data/real/**
+data/
 logs/
 extra/
-calib*
 
 
 !data/media/**
