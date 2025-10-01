@@ -23,6 +23,7 @@ class EngineRunner:
         CONFIG.engine.mpm.bulk_viscosity  = float(eta_b)
         CONFIG.engine.mpm.rate_k          = float(rate_k)
         CONFIG.engine.mpm.rate_n          = float(rate_n)
+        
 
     def run(
         self,
@@ -43,7 +44,7 @@ class EngineRunner:
         DT = self.cfl_policy.compute_stable_dt(E, nu)
 
         ti.reset()
-        ti.init(arch=ti.gpu)
+        ti.init(arch=ti.cuda, debug=False, fast_math=True, device_memory_GB=9,offline_cache=True)
 
         self._apply_params_to_config(params, DT)
         sim = Simulation(cfg=CONFIG)
@@ -57,7 +58,7 @@ class EngineRunner:
         reason = "ok"
 
         steps = 0
-        while float(sim.engine.massager.massager.time_t) < stop_time:
+        while sim.engine.unstable[None] == 0 and float(sim.engine.massager.massager.time_t) < stop_time:
             steps += 1
             if steps > max_outer_steps:
                 reason = "max_steps"
@@ -67,10 +68,10 @@ class EngineRunner:
                 sim.engine.run()
 
             # headless-safe render
-            try:
-                sim.renderer.render(sim.engine)
-            except Exception:
-                pass
+            # try:
+            #     sim.renderer.render(sim.engine)
+            # except Exception:
+            #     pass
 
             state = sim.engine.get_state()
             t     = float(state["time"])
@@ -106,7 +107,8 @@ class EngineRunner:
         # Determine completion/progress
         final_time = max(float(last_t), float(sim.engine.massager.massager.time_t))
         progress = float(np.clip(final_time / max(stop_time, 1e-9), 0.0, 1.0))
-        finished = (progress >= 1.0) and (reason in ("ok", "coarse_cap"))
+        finished = (progress >= 1.0) and (reason in ("ok"))
+        
 
         si = np.asarray(sim_indent, dtype=float)
         sf = np.asarray(sim_force,  dtype=float)

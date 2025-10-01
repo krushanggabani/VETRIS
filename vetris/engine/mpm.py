@@ -154,6 +154,9 @@ class mpmengine:
     # ──────────────────────────────────────────────────────────────────────────────
     @ti.kernel
     def init_mpm(self):
+        
+        self.unstable[None]  = 0
+
         for p in range(self.n_particles):
             # Disk sampling
             u     = ti.random()
@@ -407,7 +410,7 @@ class mpmengine:
         if self.check_stability():
             # Best-effort: jump time to the end so callers’ while-loops exit
             try:
-                self.massager.massager.time_t = float(self.massager.massager.Time_period)
+                # self.massager.massager.time_t = float(self.massager.massager.Time_period)
                 # print("[unstable]", self.get_stability_stats())
                 print("Unstable")
             except Exception:

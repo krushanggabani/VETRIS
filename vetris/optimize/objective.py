@@ -42,7 +42,7 @@ def unfinished_penalty(base_loss: float, meta: dict, scale: float = 1e2, p: floa
 
 
 class Objective:
-    def __init__(self, loss_callable, penalty_scale: float = 1e3, penalty_p: float = 1000.0):
+    def __init__(self, loss_callable, penalty_scale: float = 1e4, penalty_p: float = 1.0):
         self.loss = loss_callable
         self.penalty_scale = penalty_scale
         self.penalty_p = penalty_p

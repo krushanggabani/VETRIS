@@ -298,6 +298,7 @@ class HysteresisLoss:
         rmse_all = (np.sqrt(((rmse_load**2)*nL + (rmse_unld**2)*nU) / max(1, (nL+nU)))
                     if (nL+nU) else float("inf"))
 
+
         # progress-space alignment for peaks/slopes/area
         s_exp = _cum_abs_progress(exp_i)
         s_sim = _cum_abs_progress(sim_i)
@@ -334,7 +335,9 @@ class HysteresisLoss:
         area_sim = _trapz(sim_f_on_exp, exp_i, self.area_mode)
         d_area   = abs(area_sim - area_exp)
 
-        L = w1 * rmse_all + w2 * d_peak + w3 * d_slope + w4 * d_area
+        # L = w1 * rmse_all + w2 * d_peak + w3 * d_slope + w4 * d_area + w1*(0.7 * rmse_load + 0.3 * rmse_unld)
+        L = w1*(0.7 * rmse_load + 0.3 * rmse_unld) + w2 * d_peak + w3 * d_slope + w4 * d_area 
+        
         comps: Dict[str, float] = {
             "rmse": rmse_all, "rmse_load": rmse_load, "rmse_unload": rmse_unld,
             "n_load": nL, "n_unload": nU,

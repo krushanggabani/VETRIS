@@ -76,7 +76,8 @@ class Renderer:
         self.cfg = cfg.Vis
         self.massager_tyepe = cfg.engine.massager.type
 
-        self.gui = ti.GUI('MPM + Single Passive Arm (Attached & Outward)', res=(getattr(cfg.Vis,"resolution", 1024), getattr(cfg.Vis,"resolution", 1024)))
+        self.resolution = getattr(cfg.Vis,"resolution", 1024)
+        self.gui = ti.GUI('MPM + Single Passive Arm (Attached & Outward)', res=(self.resolution, self.resolution))
 
         # palette / tissue colors (vector form for fast lerp)
         self.palette = get_palette(getattr(cfg.Vis,"palette_name", "muscle"))
@@ -242,7 +243,7 @@ class Renderer:
         self.gui.line(begin=j2 + lit, end=ee + lit, radius=1, color=ARM_EDGE)
 
         # Roller ring (kept)
-        rr = int(self.roller_radius * 1024)
+        rr = int(self.roller_radius * self.resolution)
         self.gui.circle(ee, radius=rr + 2, color=ROLLER_EDGE)
         self.gui.circle(ee, radius=rr,     color=0xAAAAAA)
 
@@ -268,7 +269,7 @@ class Renderer:
         self.gui.line(begin=base_pt + lit, end=j2 + lit, radius=1, color=ARM_EDGE)
 
         # roller ring at the tip
-        rr = int(self.roller_radius * 1024)
+        rr = int(self.roller_radius * self.resolution)
         # self.draw_square(tip,(box_size,box_size),color=0xAAAAAA,radius=2)
         self.gui.circle(tip, radius=rr + 2, color=ROLLER_EDGE)
         self.gui.circle(tip, radius=rr,     color=0xAAAAAA)

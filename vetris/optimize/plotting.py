@@ -16,7 +16,13 @@ class Plotter:
                 writer = csv.writer(f)
                 writer.writerow([
                     "trial", "fval", "finished", "progress", "reason",
-                    "E", "nu", "eta_s", "eta_b", "rate_k", "rate_n"
+                    "E", "nu", "eta_s", "eta_b", "rate_k", "rate_n",
+                    "rmse", "rmse_load", "rmse_unload",
+                    "n_load", "n_unload",
+                    "d_peak", "d_slope", "d_area",
+                    "slope_exp_head", "slope_exp_tail",
+                    "slope_sim_head", "slope_sim_tail",
+                    "area_exp", "area_sim"
                 ])
 
     def log_progress(self, f: float):
@@ -49,15 +55,35 @@ class Plotter:
         plt.savefig(out); plt.close()
 
 
-    def log_trial(self, trial: int, x: Sequence[float], fval: float, meta: dict):
+    def log_trial(self, trial: int, x: Sequence[float], fval: float, comps:dict, meta: dict):
         """Append scalar trial record."""
+
+
         with open(self.param_log, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([
-                trial, fval, meta.get("finished", None), meta.get("progress", None), meta.get("reason", None),
-                *[f"{v:.6e}" for v in x]
+                trial,
+                fval,
+                meta.get("finished", None),
+                meta.get("progress", None),
+                meta.get("reason", None),
+                *[f"{float(v):.6e}" for v in x],  # parameters
+                f"{comps.get('rmse', ''):.6e}" if 'rmse' in comps else "",
+                f"{comps.get('rmse_load', ''):.6e}" if 'rmse_load' in comps else "",
+                f"{comps.get('rmse_unload', ''):.6e}" if 'rmse_unload' in comps else "",
+                comps.get("n_load", ""),
+                comps.get("n_unload", ""),
+                f"{comps.get('d_peak', ''):.6e}" if 'd_peak' in comps else "",
+                f"{comps.get('d_slope', ''):.6e}" if 'd_slope' in comps else "",
+                f"{comps.get('d_area', ''):.6e}" if 'd_area' in comps else "",
+                f"{comps.get('slope_exp_head', ''):.6e}" if 'slope_exp_head' in comps else "",
+                f"{comps.get('slope_exp_tail', ''):.6e}" if 'slope_exp_tail' in comps else "",
+                f"{comps.get('slope_sim_head', ''):.6e}" if 'slope_sim_head' in comps else "",
+                f"{comps.get('slope_sim_tail', ''):.6e}" if 'slope_sim_tail' in comps else "",
+                f"{comps.get('area_exp', ''):.6e}" if 'area_exp' in comps else "",
+                f"{comps.get('area_sim', ''):.6e}" if 'area_sim' in comps else "",
             ])
-
+            
     def log_curve(self, trial: int, si: np.ndarray, sf: np.ndarray):
         """Save indentation/force curve as CSV for this trial."""
         out = os.path.join(self.runs_dir, f"curve_{trial:03d}.csv")

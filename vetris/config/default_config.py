@@ -8,7 +8,7 @@ class RecordCfg:
     enabled: bool = True
     output_file: str = "output/simulation.gif"
     fps: int = 30
-    resolution: Tuple[int, int] = (1024, 1024)
+    resolution: int = 512
     palette: str = "muscle"
     show_gui: bool = True
     show_debug: bool = False
