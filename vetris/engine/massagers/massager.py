@@ -7,7 +7,7 @@ from vetris.engine.massagers.dual_arm import dual_arm_massager
 
 
 @ti.data_oriented
-class massager:
+class MassagerWrapper:
     def __init__(self, cfg):
 
         self.cfg = cfg.engine.massager

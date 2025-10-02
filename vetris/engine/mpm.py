@@ -1,7 +1,7 @@
 import taichi as ti
 import numpy as np
 
-from vetris.engine.massagers.massager import massager
+from vetris.engine.massagers.massager import MassagerWrapper
 
 PI = 3.141592653589793
 @ti.data_oriented
@@ -43,7 +43,7 @@ class mpmengine:
 
 
 
-        self.massager = massager(cfg)
+        self.massager = MassagerWrapper(cfg)
         self.massager_type = self.massager.type
 
 
