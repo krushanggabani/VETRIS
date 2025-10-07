@@ -1,7 +1,7 @@
 import taichi as ti
 import numpy as np
-
 from vetris.engine.massagers.massager import MassagerWrapper
+
 from .materials.kevin_voigt import KelvinVoigtMaterial
 from .materials.visco_hyperelastic import NeoHookeanKelvinVoigtMaterial
 

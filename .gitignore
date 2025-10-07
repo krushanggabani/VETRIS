@@ -27,7 +27,6 @@ VRenv/
 # Project outputs and Data
 runs/**
 results/**
-data/real/**
 data/
 logs/
 extra/
