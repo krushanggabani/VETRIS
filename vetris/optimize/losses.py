@@ -188,9 +188,13 @@ class HysteresisLoss:
     area_mode: AreaMode = "abs"
     method: MethodMode = "weighted_sum"
     min_points: int = 25
-    debug_plot: bool = False  # <--- NEW
+    debug_plot: bool = True  # <--- NEW
 
-    def __call__(self, exp_i, exp_f, sim_i, sim_f):
+    def __call__(self, exp_data, sim_data):
+
+        exp_i, exp_f = exp_data.indentation, exp_data.contact_force, 
+        sim_i, sim_f = sim_data.indentation, sim_data.contact_force
+        
         if self.method == "rmse_overlapped":
             return self.rmse_overlapped(exp_i, exp_f, sim_i, sim_f)
         elif self.method == "rmse":

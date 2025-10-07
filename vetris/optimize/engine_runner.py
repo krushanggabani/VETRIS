@@ -4,6 +4,7 @@ import taichi as ti
 
 from vetris.config.default_config import CONFIG
 from vetris.engine.sim import Simulation
+from .utils import ExperimentData
 
 class EngineRunner:
     """Thin adapter around your Taichi engine to produce (indentation_m, force_N) curves,
@@ -52,7 +53,7 @@ class EngineRunner:
         stop_time = float(sim.engine.massager.massager.Time_period) \
                     if self.override_time_period is None else float(self.override_time_period)
 
-        sim_indent, sim_force = [], []
+        sim_indent, sim_force, sim_time = [], [], []
         last_t = -1.0
         non_increasing = 0
         reason = "ok"
@@ -76,7 +77,7 @@ class EngineRunner:
             state = sim.engine.get_state()
             t     = float(state["time"])
             # NOTE: keep your chosen observable; here you used max_eqv_strain_contact
-            indent_m = float(state["deformation"]["max_eqv_strain_contact"]) * 1e-3
+            indent_m = float(state["deformation"]["max_eqv_strain_contact"])
 
             cf = np.asarray(state["contact_force"])
             force_N = float(cf) if cf.ndim == 0 else float(np.linalg.norm(cf.reshape(-1)))
@@ -88,6 +89,7 @@ class EngineRunner:
 
             sim_indent.append(indent_m)
             sim_force.append(force_N)
+            sim_time.append(t)
             
             # time stagnation check
             if t <= last_t:
@@ -100,9 +102,10 @@ class EngineRunner:
             last_t = t
 
             # coarse early cap
-            if coarse and len(sim_indent) > 2000:
-                reason = "coarse_cap"
-                break
+            # if coarse and len(sim_indent) > 2000:
+            #     reason = "coarse_cap"
+            #     break
+
 
         # Determine completion/progress
         final_time = max(float(last_t), float(sim.engine.massager.massager.time_t))
@@ -112,7 +115,9 @@ class EngineRunner:
 
         si = np.asarray(sim_indent, dtype=float)
         sf = np.asarray(sim_force,  dtype=float)
+        st = np.asarray(sim_time,  dtype=float)
 
+        sim_data = ExperimentData(time= st, indentation= si, contact_force= sf)
         meta = dict(
             finished=bool(finished),
             progress=progress,
@@ -121,4 +126,4 @@ class EngineRunner:
             steps=int(steps),
             reason=reason,
         )
-        return si, sf, meta
+        return sim_data, meta

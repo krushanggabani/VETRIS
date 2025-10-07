@@ -41,33 +41,30 @@ def run_pipeline(cfg: CalibConfig):
     runner = EngineRunner(cfg.massager_type, cfg.override_time_period, cfl)
     plotter = Plotter(paths.runs_dir, paths.final_dir)
 
-    loss = HysteresisLoss(weights=cfg.weights)
+    loss = HysteresisLoss(weights=cfg.weights,debug_plot=False)
     objective = Objective(loss)
 
     # 3) optimization
 
-    # param_names = ["E", "nu", "eta_s", "eta_b", "rate_k", "rate_n"]  # same order as your x
-    # # param_names = ["E", "nu", "eta_s", "eta_b"]  # same order as your x
-    # sens = ParamSensitivity(
-    #     engine_runner=runner,
-    #     objective=objective,
-    #     plotter=plotter,
-    #     bounds=cfg.bounds,             
-    #     x_ref=cfg.x0,              
-    #     param_names=param_names,
-    #     out_dir=os.path.join(plotter.final_dir, "sensitivity")
-    # )
+    param_names = ["E", "nu", "eta_s", "eta_b", "rate_k", "rate_n"]  # same order as your x
+    sens = ParamSensitivity(
+        engine_runner=runner,
+        objective=objective,
+        plotter=plotter,
+        bounds=cfg.bounds,             
+        x_ref=cfg.x0,              
+        param_names=param_names,
+        out_dir=os.path.join(plotter.final_dir, "sensitivity")
+    )
 
-    # results = sens.analyze_all(exp_i, exp_f, grid_points=21, scale_per_param=["log", "linear", "log", "log", "linear", "linear"])
+    # results = sens.analyze_all(exp_data, grid_points=21, scale_per_param=["log", "linear", "log", "log", "linear", "linear"])
 
     bayes = BayesianTPE(runner, objective, plotter, cfg.bounds, cfg.x0)
-    x_best, f_best = bayes.run_infinite(exp_i, exp_f, coarse=True)
+    x_best, f_best = bayes.run_infinite(exp_data, coarse=False)
 
     # x_best, f_best = ref.refine(x_best, exp_i, exp_f, coarse=False, maxiter=30)
 
 
-    # x_best = np.array(cfg.x0, float)
-    # f_best = float("inf")
 
     # if cfg.do_coarse:
     #     rs = RandomSearch(runner, objective, plotter, cfg.bounds, cfg.x0, sigma=cfg.coarse_sigma)

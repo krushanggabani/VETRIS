@@ -13,7 +13,7 @@ if __name__ == "__main__":
         do_fine=True,
         coarse_trials=150,
         coarse_sigma=2.0,
-        exp_subdir="exp_25",
+        exp_subdir="exp_27",
         weights=(50.0, 0.0, 0.00, 10000.0)
     )
     run_pipeline(cfg)

@@ -18,6 +18,8 @@ class OutputPaths:
         final_dir= os.path.join(exp_dir, "final")
         for d in (exp_dir, runs_dir, final_dir):
             os.makedirs(d, exist_ok=True)
+
+        
         return cls(root=root, exp_dir=exp_dir, runs_dir=runs_dir, final_dir=final_dir)
 
 
@@ -53,7 +55,6 @@ class CFLPolicy:
 
 def load_experiment(csv_path: str, csv_is_mm: bool=False):
 
-    # Load with header
     arr = np.genfromtxt(csv_path,delimiter=",",names=True,dtype=float,encoding="utf-8")
     
     if arr.dtype.names != ("time", "indentation", "contact_force"):
@@ -62,11 +63,9 @@ def load_experiment(csv_path: str, csv_is_mm: bool=False):
             f"Found: {arr.dtype.names}"
         )
 
-    # Extract columns
     time   = np.asarray(arr["time"], dtype=float)
     indent = np.asarray(arr["indentation"], dtype=float)
     force  = np.asarray(arr["contact_force"], dtype=float)
-
 
     if csv_is_mm:
         indent *= 1e-3
@@ -76,7 +75,3 @@ def load_experiment(csv_path: str, csv_is_mm: bool=False):
 
 
 
-
-exp_data = load_experiment("data/real/loop_1_filtered.csv", csv_is_mm=True)
-
-print(exp_data.indentation)

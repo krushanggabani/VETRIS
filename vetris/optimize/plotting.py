@@ -1,6 +1,7 @@
 import os, csv, numpy as np
 import matplotlib.pyplot as plt
 from typing import Sequence
+from .utils import ExperimentData
 
 class Plotter:
     def __init__(self, runs_dir: str, final_dir: str):
@@ -40,7 +41,10 @@ class Plotter:
         plt.legend(); plt.grid(True, which='both'); plt.tight_layout()
         plt.savefig(out); plt.close()
 
-    def plot_curves(self, exp_i, exp_f, sim_i, sim_f, title: str, out_name: str, annotate: str=None, to_runs=False):
+    def plot_curves(self, exp_data, sim_data, title: str, out_name: str, annotate: str=None, to_runs=False):
+        
+        exp_i, exp_f = exp_data.indentation, exp_data.contact_force, 
+        sim_i, sim_f = sim_data.indentation, sim_data.contact_force
         out_dir = self.runs_dir if to_runs else self.final_dir
         out = os.path.join(out_dir, out_name)
         plt.figure()
@@ -84,7 +88,7 @@ class Plotter:
                 f"{comps.get('area_sim', ''):.6e}" if 'area_sim' in comps else "",
             ])
             
-    def log_curve(self, trial: int, si: np.ndarray, sf: np.ndarray):
+    def log_curve(self, trial: int, sim_data:ExperimentData):
         """Save indentation/force curve as CSV for this trial."""
         out = os.path.join(self.runs_dir, f"curve_{trial:03d}.csv")
-        np.savetxt(out, np.c_[si, sf], delimiter=",", fmt="%.8e", header="indentation_m,force_N")
+        np.savetxt(out, np.c_[sim_data.time,sim_data.indentation, sim_data.contact_force], delimiter=",", fmt="%.8e", header="time_s,indentation_m,force_N")

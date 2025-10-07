@@ -1,6 +1,7 @@
 from typing import List, Tuple, Optional, Dict, Literal
 import os, csv, time
 import numpy as np
+from .utils import ExperimentData
 
 # Reuse your optional matplotlib loader
 def _ensure_mpl():
@@ -9,16 +10,21 @@ def _ensure_mpl():
 
 ScaleMode = Literal["auto", "linear", "log"]
 
-def _safe_eval(engine, objective, x, exp_i, exp_f, *, coarse=True):
+def _safe_eval(engine, objective, x, exp_data, *, coarse=True):
     """Runs engine + objective with robust failure handling."""
     try:
-        si, sf, meta = engine.run(x, coarse=coarse)
-        f, comps, npts = objective.evaluate(x, exp_i, exp_f, si, sf, meta=meta)
-        return float(f), comps, npts, si, sf, meta
+        sim_data, meta = engine.run(x, coarse=coarse)
+        f, comps, npts = objective.evaluate(x, exp_data, sim_data, meta=meta)
+
+        return float(f), comps, npts, sim_data, meta
+    
     except Exception as e:
-        si = np.asarray([], float); sf = np.asarray([], float)
+
+        si = np.asarray([], float); sf = np.asarray([], float); st = np.asarray([], float)
+        sim_data = ExperimentData(time=st,indentation=si,contact_force=sf)
         meta = {"finished": False, "progress": 0.0, "reason": f"exception:{type(e).__name__}"}
-        return float(1e12), {}, 0, si, sf, meta
+
+        return float(1e12), {}, 0, sim_data, meta
 
 def _geom_or_linspace(bounds: Tuple[float,float], num: int, mode: ScaleMode) -> np.ndarray:
     lo, hi = float(bounds[0]), float(bounds[1])
@@ -132,8 +138,7 @@ class ParamSensitivity:
 
     def analyze_param(
         self,
-        exp_i: np.ndarray,
-        exp_f: np.ndarray,
+        exp_data:ExperimentData,
         param_index: int,
         *,
         grid_points: int = 15,
@@ -164,7 +169,7 @@ class ParamSensitivity:
             self._trial_counter += 1
             tid = self._trial_counter
 
-            f, comps, npts, si, sf, meta = _safe_eval(self.engine, self.obj, x, exp_i, exp_f, coarse=coarse)
+            f, comps, npts, sim_data, meta = _safe_eval(self.engine, self.obj, x, exp_data, coarse=coarse)
             fvals[i] = f
             if f < best_f:
                 best_f, best_v = f, x[param_index]
@@ -174,7 +179,7 @@ class ParamSensitivity:
             if hasattr(self.plot, "plot_progress"): self.plot.plot_progress()
             if hasattr(self.plot, "plot_curves"):
                 self.plot.plot_curves(
-                    exp_i, exp_f, si, sf,
+                    exp_data, sim_data,
                     title=f"Sensitivity [{pname}={x[param_index]:.3e}]  f={f:.3e}",
                     out_name=f"sens_{pname}_{tid:03d}.png",
                     to_runs=True
@@ -183,7 +188,7 @@ class ParamSensitivity:
                 # save the scalar + comps to your main log CSV
                 self.plot.log_trial(tid, x, f, comps, meta)
             if hasattr(self.plot, "log_curve"):
-                self.plot.log_curve(tid, si, sf)
+                self.plot.log_curve(tid, sim_data)
 
             # also append to the per-parameter CSV
             self._append_detail_row(pname, x[param_index], f, x, meta, comps)
@@ -215,8 +220,7 @@ class ParamSensitivity:
 
     def analyze_all(
         self,
-        exp_i: np.ndarray,
-        exp_f: np.ndarray,
+        exp_data : ExperimentData,
         *,
         grid_points: int = 15,
         scale_per_param: Optional[List[ScaleMode]] = None,
@@ -233,7 +237,7 @@ class ParamSensitivity:
             scale_per_param = ["auto"] * len(self.param_names)
         for j, pname in enumerate(self.param_names):
             vals, fvals, bv, bf = self.analyze_param(
-                exp_i, exp_f, j,
+                exp_data, j,
                 grid_points=grid_points,
                 scale=scale_per_param[j],
                 coarse=coarse,

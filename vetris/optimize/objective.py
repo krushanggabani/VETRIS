@@ -48,11 +48,11 @@ class Objective:
         self.penalty_p = penalty_p
 
 
-    def evaluate(self, x, exp_i, exp_f, sim_i, sim_f, meta=None):
+    def evaluate(self, x, exp_data, sim_data, meta=None):
         
 
 
-        err, comps, npts = self.loss(exp_i, exp_f, sim_i, sim_f)
+        err, comps, npts = self.loss(exp_data, sim_data)
 
         if not np.isfinite(err):
             err = 1e12

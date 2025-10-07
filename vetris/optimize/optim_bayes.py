@@ -3,6 +3,7 @@ import os, csv, time
 import numpy as np
 import optuna
 
+from .utils import ExperimentData
 
 OPTUNA_OK = True
 
@@ -58,24 +59,24 @@ class BayesianTPE:
 
 
     def _eval_one_trial(self, x, coarse=True, trial_id=None):
-        si, sf, meta = self.engine.run(x, coarse=coarse)
+        sim_data, meta = self.engine.run(x, coarse=coarse)
 
-        f, comps, npts = self.obj.evaluate(x, self._exp_i, self._exp_f, si, sf, meta=meta)
+        f, comps, npts = self.obj.evaluate(x, self.exp_data, sim_data, meta=meta)
 
         # plotting (optional)
         self.plot.log_progress(f)
         self.plot.plot_progress()
-        self.plot.plot_curves(self._exp_i, self._exp_f, si, sf,
+        self.plot.plot_curves(self.exp_data, sim_data,
                               title=f"Bayes eval  f={f:.3e}",
                               out_name=f"run_bayes_eval_{trial_id:03d}.png",
                               to_runs=True)
 
         self.plot.log_trial(trial_id, x, f, comps,meta)
-        self.plot.log_curve(trial_id, si, sf)
+        self.plot.log_curve(trial_id, sim_data)
 
         return float(f)
 
-    def run(self, exp_i, exp_f, coarse=True) -> Tuple[np.ndarray, float]:
+    def run(self, exp_data, coarse=True) -> Tuple[np.ndarray, float]:
         if not OPTUNA_OK:
             # Simple random fallback
             best_x = _clip(self.x0.copy(), self.bounds)
@@ -103,14 +104,14 @@ class BayesianTPE:
             rate_k= trial.suggest_float("rate_k",self.bounds[4][0], self.bounds[4][1])
             rate_n= trial.suggest_float("rate_n",self.bounds[5][0], self.bounds[5][1])
             x = np.array([E, nu, eta_s, eta_b, rate_k, rate_n], float)
-            return self._eval_one_trial(x, exp_i, exp_f, coarse=coarse, trial_id=tid)
+            return self._eval_one_trial(x, coarse=coarse, trial_id=tid)
 
         study.optimize(objective_fn, n_trials=self.n_trials, show_progress_bar=False)
         xbest = np.array([study.best_params[k] for k in ["E","nu","eta_s","eta_b","rate_k","rate_n"]], float)
         fbest = float(study.best_value)
         return xbest, fbest
 
-    def run_infinite( self,exp_i: np.ndarray,exp_f: np.ndarray,coarse: bool = True,trials_per_run: int = 200,
+    def run_infinite( self,exp_data: ExperimentData,coarse: bool = True,trials_per_run: int = 200,
         patience: int = 30,min_improvement: float = 1e-3,        sampler_name: str = "tpe",  # "cmaes" or "tpe"
     ) -> Tuple[np.ndarray, float]:
         
@@ -122,8 +123,7 @@ class BayesianTPE:
         - `min_improvement`: required improvement to reset patience
         - `sampler_name`: "cmaes" (good for continuous search) or "tpe"
         """
-        self._exp_i = np.asarray(exp_i, float)
-        self._exp_f = np.asarray(exp_f, float)
+        self.exp_data = exp_data
 
         global_best_x = None
         global_best_f = np.inf

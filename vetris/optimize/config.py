@@ -27,8 +27,8 @@ class CalibConfig:
     from typing import List, Tuple
 
     bounds: List[Tuple[float, float]] = field(default_factory=lambda: [
-        (1e3, 5e6),   # E
-        (0.01, 0.49), # nu
+        (1e3, 1e5),   # E
+        (0.21, 0.99), # nu
         (1.0, 1e4),   # shear viscosity
         (1.0, 1e5),   # bulk viscosity
         (0.0, 5.0),   # rate_k
