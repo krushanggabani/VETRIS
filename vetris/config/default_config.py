@@ -69,6 +69,7 @@ class MPMCfg:
     material: str = "muscle"
     density: float = 1000.0
 
+    material_model: str = "KelvinVoigt"                         # NeoHookeanMaterial, NeoHookeanKelvinVoigtMaterial,KelvinVoigtMaterial,SLSMaterial
     youngs_modulus: float = 1.0e5
     poisson_ratio: float = 0.3    
     shear_viscosity: float = 5.0

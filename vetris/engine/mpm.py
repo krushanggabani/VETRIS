@@ -2,40 +2,40 @@ import taichi as ti
 import numpy as np
 
 from vetris.engine.massagers.massager import MassagerWrapper
+from .materials.kevin_voigt import KelvinVoigtMaterial
+from .materials.visco_hyperelastic import NeoHookeanKelvinVoigtMaterial
+
+
 
 PI = 3.141592653589793
+
 @ti.data_oriented
 class mpmengine:
     def __init__(self, cfg):
 
-        # simulation parameters
-        self.cfg = cfg.engine.mpm
-        self.dim = 2
-        self.n_particles = 20000
-        self.n_grid = 128
-        self.dx = 1.0 / self.n_grid
-        self.inv_dx = float(self.n_grid)
-        # self.dt = 2e-4
+        # ---------------- Base config ----------------
+        self.cfg          = cfg.engine.mpm
+        self.dim          = 2
+        self.n_particles  = 20000
+        self.n_grid       = 128
+        self.dx           = 1.0 / self.n_grid
+        self.inv_dx       = float(self.n_grid)
+        self.dt           = cfg.engine.dt
 
-        self.dt = cfg.engine.dt
+        
 
-        # Material (Neo-Hookean)
         self.p_rho     = 1.0
         self.p_vol     = (self.dx * 0.5) ** 2
         self.p_mass    = self.p_rho * self.p_vol
-        self.E         = self.cfg.youngs_modulus
-        self.nu        = self.cfg.poisson_ratio
-        self.mu_0      = self.E / (2 * (1 + self.nu))
-        self.lambda_0  = self.E * self.nu / ((1 + self.nu) * (1 - 2 * self.nu))
 
-        # --- Viscosity & rate-dependence (Kelvin–Voigt + simple power-law) ---
-        self.eta_shear  = float(getattr(self.cfg, "shear_viscosity",5.0))   # Pa·s-ish in code units
-        self.eta_bulk   = float(getattr(self.cfg, "bulk_viscosity",  50.0))    # bulk (ζ) for volumetric damping
 
-        # Optional nonlinear shear-thickening/thinning:  eta_eff = eta0 * (1 + k * |D|^n)
-        self.rate_k     = float(getattr(self.cfg, "rate_k", 0.0))             # 0 disables nonlinearity
-        self.rate_n     = float(getattr(self.cfg, "rate_n", 1.0))
+        if self.cfg.material_model == "KelvinVoigt":
+            self.material = KelvinVoigtMaterial(self.cfg, dim=self.dim)
+        else:
 
+            self.material = NeoHookeanKelvinVoigtMaterial(self.cfg, dim=self.dim)
+
+       
 
         # Floor & domain
         self.floor_level    = 0.0
@@ -101,40 +101,10 @@ class mpmengine:
         self.init_mpm()
         self.massager.initialize()
 
-    @ti.func
-    def neo_hookean_stress(self,F_i):
-        J_det = F_i.determinant()
-        FinvT = F_i.inverse().transpose()
-        return self.mu_0 * (F_i - FinvT) + self.lambda_0 * ti.log(J_det) * FinvT
-
-
-    @ti.func
-    def _eta_eff(self, D_norm: ti.f32) -> ti.f32:
-        # power-law multiplier; set rate_k=0 to disable
-        return ti.cast(self.eta_shear, ti.f32) * (1.0 + ti.cast(self.rate_k, ti.f32) * ti.pow(ti.max(D_norm, 0.0), ti.cast(self.rate_n, ti.f32)))
-
-    @ti.func
-    def viscous_PK1(self, F_i: ti.template(), C_i: ti.template()):
-        # Objective Newtonian: tau = 2*eta*D + zeta*tr(D) I ;   P = J * tau * F^{-T}
-        D = 0.5 * (C_i + C_i.transpose())
-        D_norm = ti.sqrt(2.0*(D[0,0]*D[0,0] + D[1,1]*D[1,1]) + 4.0*(D[0,1]*D[0,1]))
-        D_norm = ti.min(D_norm, 5e3)
-
-        eta  = self._eta_eff(D_norm)
-        zeta = ti.cast(self.eta_bulk, ti.f32)
-        I    = ti.Matrix.identity(ti.f32, self.dim)
-        tau  = 2.0 * eta * D + zeta * (D[0,0] + D[1,1]) * I
-
-        J = F_i.determinant()
-        P = ti.Matrix.zero(ti.f32, self.dim, self.dim)  # default
-
-        if J > 1e-3:
-            FinvT = F_i.inverse().transpose()
-            P = J * (tau @ FinvT)
-        return P
-
         
-        
+
+ 
+
 
     @ti.func
     def quadratic_weights(self, fx):
@@ -190,14 +160,12 @@ class mpmengine:
             w0, w1, w2 = self.quadratic_weights(fx)
             w = ti.static([w0, w1, w2])
 
-            # stress = (-self.dt * self.p_vol * 4.0 * self.inv_dx * self.inv_dx) * self.neo_hookean_stress(self.F[p])
 
+            PK = self.material.pk1_update(self.F[p],self.C[p])
 
-            P_elastic = self.neo_hookean_stress(self.F[p])
-            P_visc    = self.viscous_PK1(self.F[p], self.C[p]) # uses last-updated ∇v proxy
+           
 
-
-            stress = (-self.dt * self.p_vol * 4.0 * self.inv_dx * self.inv_dx) * (P_elastic + P_visc)
+            stress = (-self.dt * self.p_vol * 4.0 * self.inv_dx * self.inv_dx) * (PK)
             affine = stress + self.p_mass * self.C[p]
 
 

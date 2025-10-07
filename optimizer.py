@@ -59,7 +59,6 @@ def compute_stable_dt(E, nu, rho=RHO, n_grid=N_GRID_DT, cfl=CFL_NUMBER):
 DT = compute_stable_dt(CONFIG.engine.mpm.youngs_modulus,CONFIG.engine.mpm.poisson_ratio)
 CONFIG.engine.dt  = DT
 
-print(DT)
 def main():
     sim = Simulation(cfg=CONFIG)
     sim.run()
@@ -67,22 +66,22 @@ def main():
    
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     # main()
+    main()
 
-#     p= Plotter("data/logs/simulation_logs.csv")
+    p= Plotter("data/logs/simulation_logs.csv")
 
-#     sim_i,sim_f,t = p._get_xyt()
+    sim_i,sim_f,t = p._get_xyt()
 
-#     exp_i,exp_f = p._get_raw()
+    exp_i,exp_f = p._get_raw()
 
-#     # # plain scatter
-#     # p.plot(show=True)
+    # # plain scatter
+    # p.plot(show=True)
 
 
-#     # show movement as a line + small arrows every ~10 steps
-#     # p.plot_path(step=1, arrows_every=10, show=True)
+    # show movement as a line + small arrows every ~10 steps
+    # p.plot_path(step=1, arrows_every=10, show=True)
 
 
 #     # animation (mp4 or gif)
@@ -93,14 +92,43 @@ def main():
 from vetris.optimize.losses import HysteresisLoss
 from vetris.optimize.objective import Objective
 
-p= Plotter("data/logs/simulation_logs.csv")
 
-sim_i,sim_f,t = p._get_xyt()
-exp_i,exp_f = p._get_raw()
+# p= Plotter("data/logs/simulation_logs.csv")
 
-loss = HysteresisLoss(weights=(10.0, 0.5, 100, 50.0))
+# sim_i,sim_f,t = p._get_xyt()
+# exp_i,exp_f = p._get_raw()
+
+
+
+# import csv
+
+# sim_csv = "/home/krushang/Desktop/Research/HILS/VETRIS/data/calibration/exp_20/runs/curve_209.csv"
+
+# sim_i = []
+# sim_f = []
+
+# with open(sim_csv, newline='') as f:
+#     reader = csv.DictReader(f)
+#     cols = reader.fieldnames or []
+#     print("Columns:", cols)
+
+#     for r in reader:
+#         # convert to float if possible
+#         f_val = r.get("force_N")
+#         i_val = r.get("# indentation_m")
+#         if f_val is not None and i_val is not None:
+#             try:
+#                 sim_f.append(float(f_val))
+#                 sim_i.append(float(i_val))
+#             except ValueError:
+#                 # skip header lines or bad data rows
+#                 continue
+
+
+
+loss = HysteresisLoss(weights=(10.0, 0.5, 100, 50.0),debug_plot=True)
 objective = Objective(loss)
-
-
 f, com, _ = objective.evaluate(p, exp_i, exp_f, sim_i, sim_f,meta="fine")
+
+print(f)
 

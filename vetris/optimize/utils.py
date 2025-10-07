@@ -22,16 +22,15 @@ class OutputPaths:
 
 
 
-def load_experiment(csv_path: str, csv_is_mm: bool=False, max_points=None):
-    raw = np.loadtxt(csv_path, delimiter=",")
-    if raw.ndim != 2 or raw.shape[1] < 2:
-        raise ValueError("CSV must have at least two columns: indentation, force")
-    indent = raw[:,0].astype(float)
-    force  = raw[:,1].astype(float)
-    if csv_is_mm:
-        indent *= 1e-3
-    # (Optionally subsample if needed)
-    return indent, force
+@dataclass
+class ExperimentData:
+    """Container for simulation time series."""
+    time:np.ndarray
+    indentation: np.ndarray
+    contact_force: np.ndarray
+
+
+
 
 
 
@@ -50,3 +49,34 @@ class CFLPolicy:
         dx  = 1.0 / float(self.n_grid)
         dt  = self.cfl * dx / c
         return float(np.clip(dt, self.dt_min, self.dt_max))
+    
+
+def load_experiment(csv_path: str, csv_is_mm: bool=False):
+
+    # Load with header
+    arr = np.genfromtxt(csv_path,delimiter=",",names=True,dtype=float,encoding="utf-8")
+    
+    if arr.dtype.names != ("time", "indentation", "contact_force"):
+        raise ValueError(
+            f"CSV must have EXACT header: 'time,indentation,contact_force'. "
+            f"Found: {arr.dtype.names}"
+        )
+
+    # Extract columns
+    time   = np.asarray(arr["time"], dtype=float)
+    indent = np.asarray(arr["indentation"], dtype=float)
+    force  = np.asarray(arr["contact_force"], dtype=float)
+
+
+    if csv_is_mm:
+        indent *= 1e-3
+
+    data = ExperimentData(time=time,indentation=indent,contact_force=force)
+    return data
+
+
+
+
+exp_data = load_experiment("data/real/loop_1_filtered.csv", csv_is_mm=True)
+
+print(exp_data.indentation)

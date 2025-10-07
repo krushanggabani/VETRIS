@@ -33,7 +33,7 @@ class straight_massager:
         # base motion (vertical oscillation)
 
         self.y0, self.base_x = 0.330, 0.5
-        self.A,    = 0.025
+        self.A    = 0.025
         self.omega = 2/5
         self.base_y = self.y0
         self.time_t = 0.0

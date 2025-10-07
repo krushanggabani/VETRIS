@@ -103,7 +103,7 @@ class BayesianTPE:
             rate_k= trial.suggest_float("rate_k",self.bounds[4][0], self.bounds[4][1])
             rate_n= trial.suggest_float("rate_n",self.bounds[5][0], self.bounds[5][1])
             x = np.array([E, nu, eta_s, eta_b, rate_k, rate_n], float)
-            return self._eval(x, exp_i, exp_f, coarse=coarse, trial_id=tid)
+            return self._eval_one_trial(x, exp_i, exp_f, coarse=coarse, trial_id=tid)
 
         study.optimize(objective_fn, n_trials=self.n_trials, show_progress_bar=False)
         xbest = np.array([study.best_params[k] for k in ["E","nu","eta_s","eta_b","rate_k","rate_n"]], float)

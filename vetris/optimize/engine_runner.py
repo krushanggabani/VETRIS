@@ -88,7 +88,7 @@ class EngineRunner:
 
             sim_indent.append(indent_m)
             sim_force.append(force_N)
-
+            
             # time stagnation check
             if t <= last_t:
                 non_increasing += 1

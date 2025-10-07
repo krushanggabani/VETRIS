@@ -66,10 +66,12 @@ def _robust_segment_slope(
 def _split_loading_unloading(x: ArrayLike, y: ArrayLike, eps: float = 1e-12):
     x = np.asarray(x, float); y = np.asarray(y, float)
     
+
+    
     dx = np.diff(x, prepend=x[0])
     dy = np.diff(x, prepend=y[0])
-    m_load = dy > eps     # increasing indentation
-    m_unld = dy < -eps    # decreasing indentation
+    m_load = dx > eps     # increasing indentation
+    m_unld = dx < -eps    # decreasing indentation
     return (x[m_load], y[m_load]), (x[m_unld], y[m_unld])
 
 def _seg_rmse(
