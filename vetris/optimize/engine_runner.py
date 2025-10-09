@@ -102,9 +102,9 @@ class EngineRunner:
             last_t = t
 
             # coarse early cap
-            # if coarse and len(sim_indent) > 2000:
-            #     reason = "coarse_cap"
-            #     break
+            if coarse and len(sim_indent) > 5000:
+                reason = "coarse_cap"
+                break
 
 
         # Determine completion/progress

@@ -60,7 +60,7 @@ def run_pipeline(cfg: CalibConfig):
     # results = sens.analyze_all(exp_data, grid_points=21, scale_per_param=["log", "linear", "log", "log", "linear", "linear"])
 
     bayes = BayesianTPE(runner, objective, plotter, cfg.bounds, cfg.x0)
-    x_best, f_best = bayes.run_infinite(exp_data, coarse=False)
+    x_best, f_best = bayes.run_infinite(exp_data, coarse=True)
 
     # x_best, f_best = ref.refine(x_best, exp_i, exp_f, coarse=False, maxiter=30)
 

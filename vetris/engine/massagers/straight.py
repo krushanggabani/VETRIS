@@ -34,7 +34,7 @@ class straight_massager:
 
         self.y0, self.base_x = 0.330, 0.5
         self.A    = 0.025
-        self.omega = 2/5
+        self.omega = 0.4     # 0.8
         self.base_y = self.y0
         self.time_t = 0.0
         self.Time_period = 2 * PI / self.omega * 1
